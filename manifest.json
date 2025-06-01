@@ -1,0 +1,18 @@
+{
+  "short_name": "Калькулятор",
+  "name": "PWA Калькулятор",
+  "description": "Прогрессивное веб-приложение калькулятора",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f5f5",
+  "theme_color": "#4a148c",
+  "icons": [
+    {
+      "src": "logo.jpg",
+      "type": "image/jpg",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+  ],
+}

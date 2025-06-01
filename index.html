@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Калькулятор</title>
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="manifest" href="manifest.json">
+    <script>
+	if (typeof navigator.serviceWorker !== 'undefined') { // Если браузер поддерживает serviceworker
+		navigator.serviceWorker.register('serviceworker.js') //Зарегистрировать serviceworker из файла.
+	}
+    </script>
+    <style>
+        body {
+            font: 20px sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: black;
+        }
+        .calculator {
+            background-color: white;
+	    height: 600px;
+            border-radius: 10px;
+            padding: 20px;
+            border: 3px solid green;
+        }
+        .display {
+            width: 100%;
+            height: 100px;
+            font-size: 40px;
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 2px solid green;
+            border-radius: 5px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            height: 85px;
+            font-size: 32px;
+            border: none;
+            border-radius: 5px;
+            background-color: silver;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: grey;
+	    transform: scale(1.2)
+        }
+        .operator {
+            background-color: #33CC99;
+            color: white;
+        }
+        .operator:hover {
+            background-color: #339966;
+	    transform: scale(1.2)
+        }
+        .equals {
+            background-color: #33CC99;
+            color: white;
+        }
+        .equals:hover {
+            background-color: #339966;
+	    transform: scale(1.2)
+        }
+        .clear {
+            background-color: #CC3333;
+            color: white;
+        }
+        .clear:hover {
+            background-color: #990000;
+	    transform: scale(1.2)
+        }
+        #installContainer {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #installButton {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        @media (display-mode: browser) {
+            #installContainer {
+                display: block;
+            }
+        }
+	@media all and (display-mode: standalone) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            .calculator {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+        }
+        #installContainer {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        @media (hover: none) and (pointer: coarse) {
+            #installContainer {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+	<div id="installContainer">
+        	<button id="installButton">Установить приложение</button>
+	</div>
+    <div class="calculator">
+        <input type="text" class="display" id="display" readonly>
+        <div class="buttons">
+             <button class="clear" onclick="clearDisplay()">C</button>
+            <button onclick="appendToDisplay('(')">(</button>
+            <button onclick="appendToDisplay(')')">)</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('*')">×</button>
+            
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="backspace()">⌫</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        
+        function appendToDisplay(value) {
+        	if (value === '.') {
+      			const currentValue = display.value;
+        
+        		if (currentValue === '') {
+            		display.value = '0.';
+            		return;
+        		}
+
+        		const parts = currentValue.split(/[\+\-\*\/]/);
+        		const lastNumber = parts[parts.length - 1];
+        
+        		if (lastNumber.includes('.')) {
+            		return;
+        		}
+        
+        		if (['+', '-', '*', '/'].includes(currentValue.slice(-1))) {
+            		display.value += '0.';
+            		return;
+        		}
+    		}
+    
+    		display.value += value;
+        }
+        
+        function clearDisplay() {
+            display.value = '';
+        }
+        
+        function backspace() {
+            display.value = display.value.slice(0, -1);
+        }
+        
+        function calculate() {
+            try {
+                display.value = eval(display.value);
+            } catch (error) {
+                display.value = 'Ошибка';
+            }
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('serviceworker.js')
+                .then(registration => {
+                    console.log('ServiceWorker зарегистрирован:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Ошибка регистрации ServiceWorker:', error);
+                });
+            });
+        }
+
+	function isMobile() {
+            return (('ontouchstart' in window) ||
+               (navigator.maxTouchPoints > 0) ||
+               (navigator.msMaxTouchPoints > 0));
+        }
+        //"Установить"
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+        const installContainer = document.getElementById('installContainer');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+	    if (isMobileDevice()) {
+            	installContainer.style.display = 'block';
+            }
+        });
+
+        installButton.addEventListener('click', async() => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Ответ пользователя на запрос установки: ${outcome}`);
+
+                deferredPrompt = null;
+                installContainer.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installContainer.style.display = 'none';
+            deferredPrompt = null;
+            console.log('PWA было установлено');
+        });
+	    if (!isMobileDevice()) {
+        	installContainer.style.display = 'none';
+    	    }
+    </script>
+</body>
+</html>
